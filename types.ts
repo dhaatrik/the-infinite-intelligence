@@ -74,6 +74,8 @@ export interface ConversationTurn {
   agentOutputs: Record<AgentId, AgentResult>;
   finalOutput: string;
   finalFeedback?: 'up' | 'down';
+  finalScore?: number;
+  finalFeedbackText?: string;
   artifacts?: Artifact[];
   timestamp: number;
   archived?: boolean;
