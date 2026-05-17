@@ -41,6 +41,8 @@ describe('SettingsModal', () => {
     setDebateRounds: vi.fn(),
     desiredOutputFormat: 'markdown' as const,
     setDesiredOutputFormat: vi.fn(),
+    isAutoSquadEnabled: true,
+    setIsAutoSquadEnabled: vi.fn(),
   };
 
   it('renders settings modal when showSettings is true', () => {

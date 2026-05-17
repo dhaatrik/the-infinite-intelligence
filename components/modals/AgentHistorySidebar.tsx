@@ -15,7 +15,7 @@ interface AgentHistorySidebarProps {
   basePath: string;
   betaHistory: AgentHistoryItem[];
   setBetaHistory: React.Dispatch<React.SetStateAction<AgentHistoryItem[]>>;
-  setActiveAgents: React.Dispatch<React.SetStateAction<AgentPersona[]>>;
+  setActiveAgents: React.Dispatch<React.SetStateAction<Agent[]>>;
   setIsAutoSquadEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -52,7 +52,7 @@ const HistoryItemCard = ({
     e.stopPropagation();
     const dataToCopy = {
       prompt: item.prompt,
-      agents: item.agents.map(a => ({ name: a.name, role: a.role, systemPrompt: a.systemPrompt }))
+      agents: item.agents.map(a => ({ name: a.name, role: a.role, systemInstruction: a.systemInstruction }))
     };
     navigator.clipboard.writeText(JSON.stringify(dataToCopy, null, 2));
     setCopied(true);

@@ -46,13 +46,13 @@ export const LandingPage: React.FC<{ onInitialize?: () => void }> = ({ onInitial
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 40 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
-  };
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const } }
+  } as const;
 
   const staggerContainer = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.2 } }
-  };
+  } as const;
 
   // Custom Logo Component
   const Logo = () => (
@@ -106,10 +106,10 @@ export const LandingPage: React.FC<{ onInitialize?: () => void }> = ({ onInitial
         <main className="flex-grow flex flex-col items-center justify-center text-center mt-6 pb-20 relative">
           
           {/* Floating UI Elements */}
-          <motion.div animate={{ y: [0, -20, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }} className="absolute top-1/4 left-0 md:left-10 w-16 h-16 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md flex items-center justify-center opacity-40 hidden md:flex hover:opacity-100 hover:scale-110 transition-all">
+          <motion.div animate={{ y: [0, -20, 0] }} transition={{ duration: 5, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }} className="absolute top-1/4 left-0 md:left-10 w-16 h-16 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md flex items-center justify-center opacity-40 hidden md:flex hover:opacity-100 hover:scale-110 transition-all">
              <Cpu size={24} className="text-cyan-400" />
           </motion.div>
-          <motion.div animate={{ y: [0, 20, 0] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }} className="absolute top-1/3 right-0 md:right-10 w-12 h-12 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md flex items-center justify-center opacity-40 hidden md:flex hover:opacity-100 hover:scale-110 transition-all">
+          <motion.div animate={{ y: [0, 20, 0] }} transition={{ duration: 6, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }} className="absolute top-1/3 right-0 md:right-10 w-12 h-12 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md flex items-center justify-center opacity-40 hidden md:flex hover:opacity-100 hover:scale-110 transition-all">
              <Zap size={20} className="text-purple-400" />
           </motion.div>
           {/* Floating Tech Badges */}
@@ -181,7 +181,7 @@ export const LandingPage: React.FC<{ onInitialize?: () => void }> = ({ onInitial
             onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: 'smooth' })}
           >
              <p className="text-[10px] uppercase tracking-[0.2em] font-bold">Scroll</p>
-             <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}>
+             <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2, ease: "easeInOut" }}>
                <Mouse size={20} />
              </motion.div>
           </motion.div>
@@ -213,7 +213,7 @@ export const LandingPage: React.FC<{ onInitialize?: () => void }> = ({ onInitial
                     <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 1.5 }}><span className="text-yellow-400">[Analyst]</span> Synthesizing data points...</motion.p>
                     <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 2.0 }}><span className="text-rose-400">[Critic]</span> Identifying counter-arguments in dataset...</motion.p>
                     <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 2.5 }} className="text-cyan-400 font-bold mt-2">✓ Consensus reached. Final synthesis generated in 2.4s.</motion.p>
-                    <motion.span initial={{ opacity: 0 }} animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1 }} className="inline-block w-2 h-4 bg-white mt-1"></motion.span>
+                    <motion.span initial={{ opacity: 0 }} animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1 }} className="inline-block w-2 h-4 bg-white mt-1"></motion.span>
                 </div>
             </div>
         </div>

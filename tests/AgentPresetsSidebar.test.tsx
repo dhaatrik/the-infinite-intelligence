@@ -29,6 +29,7 @@ describe('AgentPresetsSidebar', () => {
           setActiveAgents={vi.fn()}
           setEditingPreset={vi.fn()}
           setCustomSavedPresets={vi.fn()}
+          setIsAutoSquadEnabled={vi.fn()}
         />
       </BrowserRouter>
     );
@@ -45,6 +46,7 @@ describe('AgentPresetsSidebar', () => {
           setActiveAgents={vi.fn()}
           setEditingPreset={vi.fn()}
           setCustomSavedPresets={vi.fn()}
+          setIsAutoSquadEnabled={vi.fn()}
         />
       </BrowserRouter>
     );

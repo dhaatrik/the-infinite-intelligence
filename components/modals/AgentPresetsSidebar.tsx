@@ -11,7 +11,7 @@ interface AgentPresetsSidebarProps {
   setEditingPreset: React.Dispatch<React.SetStateAction<AgentPreset | null>>;
   customSavedPresets: Record<string, AgentPreset>;
   setCustomSavedPresets: React.Dispatch<React.SetStateAction<Record<string, AgentPreset>>>;
-  setActiveAgents: React.Dispatch<React.SetStateAction<AgentPersona[]>>;
+  setActiveAgents: React.Dispatch<React.SetStateAction<Agent[]>>;
   setIsAutoSquadEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 }
 

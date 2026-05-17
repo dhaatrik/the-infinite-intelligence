@@ -1,162 +1,227 @@
-# The Infinite Intelligence
+<h1 align="center">🌌 The Infinite Intelligence</h1>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
-[![Vite](https://img.shields.io/badge/Vite-6-purple.svg)](https://vitejs.dev/)
-[![Gemini](https://img.shields.io/badge/AI-Gemini%203.1-orange.svg)](https://deepmind.google/technologies/gemini/)
+<p align="center">
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19.0-cyan.svg?style=flat-square&logo=react" alt="React" /></a>
+  <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-6.0-purple.svg?style=flat-square&logo=vite" alt="Vite" /></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.0-blue.svg?style=flat-square&logo=typescript" alt="TypeScript" /></a>
+  <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC.svg?style=flat-square&logo=tailwind-css" alt="Tailwind CSS" /></a>
+  <a href="https://vitest.dev/"><img src="https://img.shields.io/badge/Vitest-4.0-yellow.svg?style=flat-square&logo=vitest" alt="Vitest" /></a>
+  <a href="https://deepmind.google/technologies/gemini/"><img src="https://img.shields.io/badge/AI-Gemini_3.1-orange.svg?style=flat-square" alt="Gemini" /></a>
+</p>
 
-**The Infinite Intelligence** is a state-of-the-art multi-agent AI orchestration platform designed to solve complex problems through collaborative intelligence. By leveraging a diverse set of specialized AI agents, the platform breaks down intricate requests, analyzes them from first principles, and synthesizes a comprehensive, high-quality solution.
+**The Infinite Intelligence** is a premium, client-side multi-agent AI orchestration platform designed to tackle high-complexity reasoning, synthesis, and creative tasks. By organizing a specialized squad of four distinct expert personas (and custom user-defined agents), the platform analyzes problems from **first principles**, facilitates inter-agent debate and refinement, incorporates human-in-the-loop steering, and synthesizes unified executive reports.
 
-Built with a focus on modularity, transparency, and human-AI collaboration, The Infinite Intelligence provides a professional-grade environment for advanced prompt engineering and multi-agent workflows.
+Built as an interactive single-page application (SPA), the workspace prioritizes visual clarity, modularity, and high-performance client-side execution using Google's modern Gemini models via `@google/genai`.
 
 ---
 
 ## 📖 Table of Contents
 
-- [Features](#-features)
-- [Architecture](#-architecture)
-- [Tech Stack](#-tech-stack)
-- [Installation & Requirements](#-installation--requirements)
-- [Usage Instructions](#-usage-instructions)
-- [Development & Contribution](#-development--contribution)
-- [Testing Instructions](#-testing-instructions)
-- [License](#-license)
+- [🤔 The "Why" behind The Infinite Intelligence](#-the-why-behind-the-infinite-intelligence)
+- [🏗️ Orchestration Flow & Architecture](#%EF%B8%8F-orchestration-flow--architecture)
+- [✨ Key Features](#-key-features)
+- [💻 Technology Stack](#-technology-stack)
+- [🚀 Quick Start & Installation](#-quick-start--installation)
+- [🛠️ Developer Guide (Extending the Squad)](#%EF%B8%8F-developer-guide-extending-the-squad)
+- [🧪 Testing & Quality Assurance](#-testing--quality-assurance)
+- [🤝 Contribution Guidelines](#-contribution-guidelines)
+- [👤 Author](#-author)
+- [📄 License](#-license)
 
 ---
 
-## ✨ Features
+## 🤔 The "Why" behind The Infinite Intelligence
 
-### 🤖 Multi-Agent Orchestration
-- **Parallel Collaboration**: All agents work simultaneously for maximum efficiency.
-- **Sequential Workflows**: Agents build upon each other's work in a structured chain.
-- **Round-Robin Debate**: Agents engage in multiple rounds of critique and refinement to reach a consensus.
-- **Dynamic Agent Assembly**: In Beta Mode, the system automatically designs and deploys specialized agent personas tailored to your specific request.
+Single-agent prompts often fall short when addressing high-stakes or multi-dimensional problems. They are prone to bias, early saturation of reasoning, and occasional hallucinations. 
 
-### 🧠 Advanced Intelligence
-- **First Principles Analysis**: Every prompt is analyzed to identify core constraints and underlying goals before execution.
-- **Inter-Agent Debate & Critique**: Agents review and critique each other's initial responses across multiple configurable rounds.
-- **Human-In-The-Loop (HITL)**: Optional review phase allowing users to critique agent outputs before final synthesis.
-- **Short-Term Memory**: Agents recall their previous interactions within the current conversation turn, improving context awareness.
-
-### 🛠️ Professional Tools
-- **Artifact Extraction**: Automatically identifies and extracts code snippets, JSON data, and structured reports into an interactive panel.
-- **Session Branching**: Fork any conversation at any point to explore alternative solutions without losing context.
-- **Executive Report Export**: Download synthesized reports as high-quality PDF or Markdown files.
-- **Token Usage Tracking**: Real-time monitoring of token consumption for cost and performance visibility.
-- **Web Grounding**: Agents have access to Google Search to ground their responses in current information.
+**The Infinite Intelligence** addresses these challenges using a collaborative, multi-agent pattern:
+*   **Diverse Perspectives:** By splitting a request among specialized personas (e.g., an analyst, a pragmatist, a coder, and a critic), the problem is thoroughly examined from multiple professional angles.
+*   **Adversarial Refinement:** Before presenting a solution, the agents review and critique each other's work over configurable rounds to identify logical gaps, missing constraints, or flawed assumptions.
+*   **First-Principles Grounding:** Rather than rushing to generate a response, the platform forces a preliminary analysis phase to extract the core truths, target boundaries, and critical dependencies.
+*   **Zero Server Footprint:** By executing directly in the browser via highly optimized client-side React and direct API calls, users maintain complete control of their API key usage and session data without sending data to third-party database backends.
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Orchestration Flow & Architecture
 
-The application follows a client-side React architecture (Single Page Application) built with Vite, separating core orchestration logic from presentation:
+The application follows a structured, modular pipeline where each step is visualised in real-time for maximum auditability:
 
-1. **Input Stage**: User submits a prompt.
-2. **Analysis Stage**: The prompt is analyzed via First Principles to identify fundamental truths.
-3. **Assembly Stage**: Optimal AI personas are selected or dynamically generated based on the prompt.
-4. **Execution Stage**: Agents generate unique perspectives in parallel, sequential, or round-robin modes.
-5. **Critique Stage**: Agents review and refine each other's work over multiple rounds.
-6. **Review Stage (Optional)**: HITL allows for human feedback and steering.
-7. **Synthesis Stage**: Refined responses are unified into a final, high-quality output.
+```mermaid
+graph TD
+    A[User Input Prompt] --> B[First Principles Analysis]
+    B --> C[Dynamic Squad Assembly / Setup]
+    C --> D{Collaboration Mode}
+    D -- Parallel --> E[Simultaneous Execution]
+    D -- Sequential --> F[Chained Agent Handoffs]
+    D -- Round-Robin --> G[Iterative Discussion Cycles]
+    E & F & G --> H[Inter-Agent Critique & Debate]
+    H --> I[Human-In-The-Loop Steering Optional]
+    I --> J[Synthesizer Agent Convergence]
+    J --> K[Interactive Artifact Viewer]
+    J --> L[Executive Summary Panel]
+```
+
+### Flow Breakdown:
+1.  **First Principles Phase:** Translates the user's prompt into an underlying foundation of fundamental truths.
+2.  **Squad Allocation:** Deploys the active four-agent expert team (or dynamically generates customized agent personas in **Beta Mode**).
+3.  **Coordination Mode:** Runs the agents using the selected topology (Parallel, Sequential, or Round-Robin).
+4.  **Critique & Debates:** Evaluates intermediate outputs across configured cycles (up to 5 rounds) for cross-refinement.
+5.  **Steering (HITL):** Allows you to approve, redirect, or critique individual agent insights before compiling the final response.
+6.  **Synthesis:** Merges all agent outputs, critique logs, and user guidance into a clean, markdown-rendered master report.
 
 ---
 
-## 💻 Tech Stack
+## ✨ Key Features
 
-- **Frontend Framework**: [React 19](https://react.dev/)
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Animations**: [Motion 12](https://motion.dev/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **AI Integration**: [@google/genai](https://www.npmjs.com/package/@google/genai) (Gemma 4 Orchestration)
-- **Document Generation**: [html2canvas](https://html2canvas.hertzen.com/), [jsPDF](https://rawgit.com/MrRio/jsPDF/master/docs/index.html)
-- **Markdown Rendering**: [react-markdown](https://github.com/remarkjs/react-markdown)
+| Feature | Description | Business/Developer Benefit |
+| :--- | :--- | :--- |
+| **Multi-Agent Topologies** | Run parallel, sequential, or round-robin debate flows with configurable refinement cycles. | Flexibility to adjust execution cost, latency, and reasoning depth per request. |
+| **First-Principles Engine** | Automatically deconstructs prompts into core goals, constraints, and dependencies first. | Drastically improves agent accuracy and reduces off-topic generation. |
+| **Beta Mode (Dynamic Squad)** | Dynamically generates custom-tailored agent personas optimized for the specific task. | Immediate expert alignment without needing manual prompt configuration. |
+| **Human-In-The-Loop (HITL)** | Intercept, score (thumbs up/down), or rewrite agent directions mid-generation. | Ensures the final synthesized response aligns exactly with your intent. |
+| **Interactive Artifact Panel** | Automatically extracts code snippets, JSON objects, and documents to a side panel. | Clear separation of code/data from explanations, perfect for copying or reviewing. |
+| **Session Branching & History** | Fork any conversation branch at any historical node to explore new alternatives. | Safe, non-destructive experimentation during long sessions. |
+| **Executive Reports** | Download reports instantly as styled PDFs or standard Markdown files. | Professional presentation format ready to share with teams or clients. |
+| **Token & Cost Metrics** | Track exact input/output tokens and estimate API costs in real-time. | Total visibility over resource usage and prompt performance. |
 
 ---
 
-## 🚀 Installation & Requirements
+## 💻 Technology Stack
+
+*   **Core UI & State:** [React 19](https://react.dev/) & [TypeScript](https://www.typescriptlang.org/) — Ensures predictable, type-safe state management across complex sidebars, modals, and streaming states.
+*   **Styling & Themes:** [Tailwind CSS](https://tailwindcss.com/) — Premium, dark-mode-first styling with modern frosted glass (glassmorphism) layout.
+*   **Animations:** [Motion 12](https://motion.dev/) — Micro-interactions, slide-out sidebar panels, and interactive state transitions.
+*   **Icons:** [Lucide React](https://lucide.dev/) — Consistent, high-quality outline vector iconography.
+*   **AI Service Layer:** `@google/genai` (using Gemma 4/Gemini SDK) — Modern API integration supporting streaming, system instructions, and temperature tuning.
+*   **Document Export:** `html2canvas` & `jsPDF` — Client-side HTML-to-vector PDF translation.
+*   **Test Runner:** [Vitest](https://vitest.dev/) & [React Testing Library](https://testing-library.com/) — Light-speed test execution with complete DOM mocking and coverage indicators.
+
+---
+
+## 🚀 Quick Start & Installation
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or higher)
-- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
-- A **Google Gemini API Key**
+*   **Node.js** (v18.0.0 or higher)
+*   **npm** or **yarn** package manager
+*   A **Google Gemini API Key** (Get one from [Google AI Studio](https://aistudio.google.com/))
 
-### Setup Instructions
+### Installation Steps
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/your-username/the-infinite-intelligence.git
-   cd the-infinite-intelligence
-   ```
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/dhaatrik/the-infinite-intelligence.git
+    cd the-infinite-intelligence
+    ```
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+2.  **Install Project Dependencies**
+    ```bash
+    npm install
+    ```
 
-3. **Configure Environment Variables**:
-   Create a `.env` file in the root directory and add your API key:
-   ```env
-   VITE_GEMINI_API_KEY=your_api_key_here
-   ```
+3.  **Configure Environment Variables**
+    Create a `.env` file in the root directory:
+    ```env
+    VITE_GEMINI_API_KEY=your_gemini_api_key_here
+    ```
 
-4. **Start the development server**:
-   ```bash
-   npm run dev
-   ```
+4.  **Launch the Development Server**
+    ```bash
+    npm run dev
+    ```
+    Open your browser and navigate to `http://localhost:5173`.
 
-5. **Build for production**:
-   ```bash
-   npm run build
-   ```
-
----
-
-## 📖 Usage Instructions
-
-1. **Enter a Prompt**: Type a complex question or problem into the main input area.
-2. **Observe the Process**: Watch the **Processing Visualizer** as the system analyzes your prompt and coordinates agent activity.
-3. **Review Perspectives**: Read individual agent outputs in the grid or tab view.
-4. **Provide Feedback**: Use the thumbs up/down icons on agent cards to guide their future behavior.
-5. **Final Synthesis**: Consume the unified final output, which incorporates all expert perspectives.
-6. **Export Results**: Use the **Download** icon to export the synthesized report as a PDF or Markdown file.
+5.  **Compile the Production Bundle**
+    ```bash
+    npm run build
+    ```
+    Static build files will be outputted to the `dist/` directory, optimized and ready for production deployment (e.g., Vercel, Netlify, or GitHub Pages).
 
 ---
 
-## 🤝 Development & Contribution
+## 🛠️ Developer Guide (Extending the Squad)
 
-Contributions are welcome! We follow the [Contributor Covenant](https://www.contributor-covenant.org/) code of conduct.
+The Infinite Intelligence is architected to make adding new agent configurations, icons, and structures incredibly simple. 
 
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/AmazingFeature`).
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-4. Push to the branch (`git push origin feature/AmazingFeature`).
-5. Open a Pull Request.
+### 1. Register a New Base Agent
+Open `constants.ts` and append your agent config to the `DEFAULT_AGENTS` array. The model automatically respects all custom guidelines defined in `systemInstruction`:
+
+```typescript
+// constants.ts
+export const DEFAULT_AGENTS: Agent[] = [
+  // ... existing agents
+  {
+    id: 'security-auditor',
+    name: 'Shield_Agent',
+    role: 'Security & Vulnerability Auditor',
+    systemInstruction: 'You are an elite cybersecurity specialist. Your goal is to review all proposed architectures, code, and systems to detect vulnerabilities, data leaks, and compliance gaps. Provide specific patches.',
+    icon: 'ShieldCheck',
+    color: 'text-rose-400 border-rose-500/20 bg-rose-500/5',
+  }
+];
+```
+
+### 2. Verify or Update TypeScript Definitions
+Ensure any dynamic configurations or new parameters are represented in `types.ts`:
+
+```typescript
+// types.ts
+export interface Agent {
+  id: string;
+  name: string;
+  role: string;
+  systemInstruction: string;
+  icon: string;
+  color: string;
+}
+```
 
 ---
 
-## 🧪 Testing Instructions
+## 🧪 Testing & Quality Assurance
 
-To verify changes and ensure code quality:
+To maintain excellent stability, all critical UI components (Sidebars, Cards, Settings modal, Markdown renderers, and state logic) are backed by automated tests using **Vitest** and **React Testing Library**.
 
-1. **Linting**:
-   ```bash
-   npm run lint
-   ```
-2. **Manual Verification**:
-   - Run the development server (`npm run dev`).
-   - Configure **Workflow Topology** (Quick, Standard, or Deep) in Settings.
-   - Submit a test prompt and verify the **First Principles Analysis** appears.
-   - Ensure **Artifact Extraction** correctly identifies code or JSON blocks.
-   - Test the **Branching** and **PDF Export** functionalities.
+### Execution Command
+Run the complete test runner:
+```bash
+npm run test
+```
+
+### Testing Strategy
+-   **Unit Tests:** Verifies individual helper utilities and constants (e.g., [constants.test.ts](file:///e:/E%20Drive%20Projects/00%20Github/the-infinite-intelligence/tests/constants.test.ts)).
+-   **Component Mocking:** Exercises conditional rendering, trigger buttons, state propagation, and router integration for complex items like [SettingsModal.test.tsx](file:///e:/E%20Drive%20Projects/00%20Github/the-infinite-intelligence/tests/SettingsModal.test.tsx) and [AgentPresetsSidebar.test.tsx](file:///e:/E%20Drive%20Projects/00%20Github/the-infinite-intelligence/tests/AgentPresetsSidebar.test.tsx).
+-   **Type Integrity Check:** Strictly validated by running `npm run lint` (`tsc --noEmit`) to ensure clean compilations.
+
+---
+
+## 🤝 Contribution Guidelines
+
+Contributions make the open-source community an amazing place to learn, inspire, and create. If you'd like to participate:
+
+1.  Review our structured [Contributing Guidelines](CONTRIBUTING.md).
+2.  Fork the repository and create your feature branch: `git checkout -b feature/AmazingFeature`.
+3.  Ensure your code satisfies the type-checker by running `npm run lint`.
+4.  Add robust tests for your new component or utility.
+5.  Open a detailed Pull Request detailing your implementation decisions.
+
+---
+
+## 👤 Author
+
+**Dhaatrik Chowdhury**
+*   **GitHub:** [@dhaatrik](https://github.com/dhaatrik)
+*   **LinkedIn:** [dhaatrik](https://www.linkedin.com/in/dhaatrik/)
+*   **X / Twitter:** [@dhaatrik](https://x.com/dhaatrik)
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the terms of the **MIT License**. Check the [LICENSE](LICENSE) file for complete terms and permissions.
 
 ---
 
-**Empowering human decisions with the precision of collective intelligence.**
+<p align="center">
+  <b>Empowering human decisions with the precision of collective intelligence. 🌌</b>
+</p>

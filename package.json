@@ -3,6 +3,17 @@
   "private": true,
   "version": "4.0.0",
   "type": "module",
+  "description": "A multi-agent AI orchestration platform for collaborative intelligence and high-stakes synthesis.",
+  "author": "Dhaatrik Chowdhury",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dhaatrik/the-infinite-intelligence.git"
+  },
+  "homepage": "https://github.com/dhaatrik/the-infinite-intelligence",
+  "bugs": {
+    "url": "https://github.com/dhaatrik/the-infinite-intelligence/issues"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
