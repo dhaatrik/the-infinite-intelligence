@@ -31,8 +31,7 @@ Do not answer the prompt yourself. Only provide the detailed, broken-down versio
       config: {
         systemInstruction,
         temperature: 0.3,
-        tools: isWebSearchEnabled ? [{ googleSearch: {} }] : undefined,
-        thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH }
+        tools: isWebSearchEnabled ? [{ googleSearch: {} }] : undefined
       }
     });
     return { text: response.text || userPrompt, usage: response.usageMetadata };
@@ -57,7 +56,9 @@ Return a JSON array of exactly 4 objects. Each object must have:
 - color: A Tailwind text color class (e.g., "text-emerald-400", "text-rose-400", "text-indigo-400", "text-amber-400")
 - bgGradient: A Tailwind gradient class (e.g., "from-emerald-900/20 to-emerald-900/5")
 - icon: One of these exact strings: "BrainCircuit", "Sparkles", "ShieldCheck", "Hammer"
-- systemInstruction: A highly detailed, specific instruction for how this persona should analyze the problem, including their unique perspective, methodologies they should apply, and what aspects of the problem they should prioritize.`;
+- systemInstruction: A highly detailed, specific instruction for how this persona should analyze the problem, including their unique perspective, methodologies they should apply, and what aspects of the problem they should prioritize.
+
+IMPORTANT: Return ONLY a valid JSON array. Do not include any conversational text, markdown formatting, or backticks!`;
 
   try {
     const response = await ai.models.generateContent({
@@ -68,29 +69,14 @@ Return a JSON array of exactly 4 objects. Each object must have:
       ],
       config: {
         systemInstruction,
-        temperature: 0.5,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              id: { type: Type.STRING },
-              name: { type: Type.STRING },
-              role: { type: Type.STRING },
-              description: { type: Type.STRING },
-              color: { type: Type.STRING },
-              bgGradient: { type: Type.STRING },
-              icon: { type: Type.STRING },
-              systemInstruction: { type: Type.STRING },
-            },
-            required: ["id", "name", "role", "description", "color", "bgGradient", "icon", "systemInstruction"]
-          }
-        }
+        temperature: 0.5
       }
     });
     
-    const agents = JSON.parse(response.text || "[]");
+    const rawText = response.text || "[]";
+    const match = rawText.match(/\[[\s\S]*\]/);
+    const jsonStr = match ? match[0] : rawText;
+    const agents = JSON.parse(jsonStr);
     // Ensure IDs map to our enum
     const mappedAgents = agents.map((a: any, i: number) => ({
       ...a,
@@ -130,8 +116,7 @@ export const generateAgentResponse = async (
         config: {
           systemInstruction: finalInstruction,
           temperature: 0.7,
-          tools: isWebSearchEnabled ? [{ googleSearch: {} }] : undefined,
-          thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH }
+          tools: isWebSearchEnabled ? [{ googleSearch: {} }] : undefined
         }
       });
       
@@ -241,7 +226,7 @@ export const synthesizeFinalResponse = async (
   history: ChatMessage[] = [],
   temperature: number = 0.5,
   agentFeedback?: Record<AgentId, 'up' | 'down' | null>,
-  advancedParams?: { topP?: number; topK?: number; frequencyPenalty?: number },
+  advancedParams?: { topP?: number; topK?: number; frequencyPenalty?: number; outputFormat?: string },
   isWebSearchEnabled: boolean = false
 ) => {
   try {
@@ -272,7 +257,7 @@ export const synthesizeFinalResponse = async (
       `--- AGENT INPUTS & DEBATE ---\n`,
       ...agents.map(formatAgentInput),
       `--- END AGENT INPUTS ---\n`,
-      `Based on the above, generate the final synthesized response. Take into account any feedback notes attached to the agent inputs, and heavily weigh their post-debate critiques.`
+      `Based on the above, generate the final synthesized response. Take into account any feedback notes attached to the agent inputs, and heavily weigh their post-debate critiques.${advancedParams?.outputFormat ? `\n\nThe final output MUST be formatted as: ${advancedParams.outputFormat.toUpperCase()}` : ''}`
     ];
 
     const stream = await ai.models.generateContentStream({
@@ -287,8 +272,7 @@ export const synthesizeFinalResponse = async (
         topP: advancedParams?.topP,
         topK: advancedParams?.topK,
         frequencyPenalty: advancedParams?.frequencyPenalty,
-        tools: isWebSearchEnabled ? [{ googleSearch: {} }] : undefined,
-        thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH }
+        tools: isWebSearchEnabled ? [{ googleSearch: {} }] : undefined
       }
     });
 
@@ -308,7 +292,9 @@ Return a JSON array of objects. Each object must have:
 - title: A short, descriptive title that clearly indicates the artifact's purpose
 - type: One of "code", "markdown", "json", "text", "html"
 - content: The exact, complete content of the artifact as it appears in the text. Do not truncate or summarize.
-If there are no clear standalone artifacts, return an empty array [].`;
+If there are no clear standalone artifacts, return an empty array [].
+
+IMPORTANT: Return ONLY a valid JSON array. Do not include any conversational text, markdown formatting, or backticks!`;
 
   try {
     const response = await ai.models.generateContent({
@@ -318,25 +304,14 @@ If there are no clear standalone artifacts, return an empty array [].`;
       ],
       config: {
         systemInstruction,
-        temperature: 0.1,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              id: { type: Type.STRING },
-              title: { type: Type.STRING },
-              type: { type: Type.STRING },
-              content: { type: Type.STRING },
-            },
-            required: ["id", "title", "type", "content"]
-          }
-        }
+        temperature: 0.1
       }
     });
     
-    return { artifacts: JSON.parse(response.text || "[]"), usage: response.usageMetadata };
+    const rawText = response.text || "[]";
+    const match = rawText.match(/\[[\s\S]*\]/);
+    const jsonStr = match ? match[0] : rawText;
+    return { artifacts: JSON.parse(jsonStr), usage: response.usageMetadata };
   } catch (error) {
     console.error("Error extracting artifacts:", error);
     return { artifacts: [] };

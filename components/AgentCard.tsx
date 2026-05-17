@@ -13,6 +13,8 @@ interface AgentCardProps {
   feedback?: 'up' | 'down';
   onFeedback?: (feedback: 'up' | 'down') => void;
   sessionHistory?: AgentResult[];
+  isDebugMode?: boolean;
+  result?: AgentResult;
 }
 
 const IconMap: Record<string, React.FC<any>> = {
@@ -137,7 +139,9 @@ export const AgentCard: React.FC<AgentCardProps> = ({
   error, 
   feedback, 
   onFeedback,
-  sessionHistory = []
+  sessionHistory = [],
+  isDebugMode,
+  result
 }) => {
   const Icon = IconMap[agent.icon] || BrainCircuit;
   const [showErrorDetails, setShowErrorDetails] = useState(true);
@@ -153,18 +157,23 @@ export const AgentCard: React.FC<AgentCardProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`relative flex flex-col h-full rounded-xl border ${status === AgentStatus.ERROR ? 'border-red-500/50' : feedback === 'up' ? 'border-green-500/80 shadow-[0_0_20px_rgba(34,197,94,0.3)] ring-1 ring-green-500/50' : feedback === 'down' ? 'border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.3)] ring-1 ring-red-500/50' : 'border-white/10'} bg-gradient-to-br ${agent.bgGradient} backdrop-blur-sm overflow-hidden transition-all duration-500 hover:border-white/20 shadow-lg`}
+      className={`relative flex flex-col h-full rounded-[1.4rem] border ${status === AgentStatus.ERROR ? 'border-red-500/50' : feedback === 'up' ? 'border-green-500/80 shadow-[0_0_30px_rgba(34,197,94,0.3)] ring-1 ring-green-500/50' : feedback === 'down' ? 'border-red-500/80 shadow-[0_0_30px_rgba(239,68,68,0.3)] ring-1 ring-red-500/50' : 'border-white/10'} bg-gradient-to-br ${agent.bgGradient} backdrop-blur-2xl overflow-hidden transition-all duration-500 hover:border-white/20 shadow-2xl`}
     >
+      <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+      
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/5">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-white/5 bg-black/20">
         <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg bg-black/40 ${agent.color}`}>
-            <Icon size={20} className={(status === AgentStatus.THINKING || status === AgentStatus.CRITIQUING) ? 'animate-pulse' : ''} />
+          <div className={`p-2.5 rounded-xl bg-black/60 shadow-inner ${agent.color} border border-white/5`}>
+            <Icon size={18} className={(status === AgentStatus.THINKING || status === AgentStatus.CRITIQUING) ? 'animate-pulse' : ''} />
           </div>
           <div className="flex items-center gap-2">
-            <div>
-              <h3 className={`font-bold text-sm tracking-wide ${agent.color}`}>{agent.name}</h3>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider">{agent.role}</p>
+            <div className="group relative cursor-help" title={agent.description}>
+              <h3 className={`font-black text-sm tracking-wide ${agent.color}`} style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{agent.name}</h3>
+              <p className="text-[9px] font-bold text-gray-500/80 uppercase tracking-[0.2em]">{agent.role}</p>
+              <div className="absolute left-0 top-full mt-2 w-56 p-3 bg-black/95 border border-white/10 rounded-xl text-xs leading-relaxed text-gray-300 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none shadow-2xl backdrop-blur-xl">
+                {agent.description}
+              </div>
             </div>
             {sessionHistory.length > 0 && (
               <button
@@ -215,6 +224,16 @@ export const AgentCard: React.FC<AgentCardProps> = ({
 
       {/* Content Area */}
       <div className="flex-1 p-4 overflow-y-auto scrollbar-hide text-xs sm:text-sm leading-relaxed text-gray-300">
+        {isDebugMode && result?.usage && (
+          <div className="mb-4 bg-black/60 p-2 rounded-lg border border-emerald-500/20 text-[10px] font-mono flex items-center justify-between text-emerald-400">
+             <div className="flex gap-4">
+                 <span>Prompt: {result.usage.promptTokenCount}</span>
+                 <span>Candidates: {result.usage.candidatesTokenCount}</span>
+                 <span>Total: {result.usage.totalTokenCount}</span>
+             </div>
+             <Activity size={12} className="opacity-50" />
+          </div>
+        )}
         <AnimatePresence mode="wait">
           {showHistory ? (
             <motion.div

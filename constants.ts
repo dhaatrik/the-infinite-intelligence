@@ -48,7 +48,7 @@ export const AGENTS: Record<AgentId, AgentPersona> = {
     description: "Dynamically assigned specialist.",
     color: "text-cyan-400",
     bgGradient: "from-cyan-900/20 to-cyan-900/5",
-    icon: "Bot",
+    icon: "Lightbulb",
     systemInstruction: "You are a dynamic specialist dynamically assigned to this task. Your role is highly specialized. Focus entirely on your specific domain of expertise. Emphasize role-specific methodologies and expected expert output formats. Apply the standard frameworks and best practices of your assigned field. Provide deep, expert-level insights that generalists would miss. Be precise, use appropriate industry terminology, and offer concrete examples or strategies relevant to your specific role."
   },
   [AgentId.DYNAMIC_2]: {
@@ -58,7 +58,7 @@ export const AGENTS: Record<AgentId, AgentPersona> = {
     description: "Dynamically assigned specialist.",
     color: "text-indigo-400",
     bgGradient: "from-indigo-900/20 to-indigo-900/5",
-    icon: "Bot",
+    icon: "Hammer",
     systemInstruction: "You are a dynamic specialist dynamically assigned to this task. Your role is highly specialized. Focus entirely on your specific domain of expertise. Emphasize role-specific methodologies and expected expert output formats. Apply the standard frameworks and best practices of your assigned field. Provide deep, expert-level insights that generalists would miss. Be precise, use appropriate industry terminology, and offer concrete examples or strategies relevant to your specific role."
   },
   [AgentId.DYNAMIC_3]: {
@@ -68,7 +68,7 @@ export const AGENTS: Record<AgentId, AgentPersona> = {
     description: "Dynamically assigned specialist.",
     color: "text-rose-400",
     bgGradient: "from-rose-900/20 to-rose-900/5",
-    icon: "Bot",
+    icon: "ShieldCheck",
     systemInstruction: "You are a dynamic specialist dynamically assigned to this task. Your role is highly specialized. Focus entirely on your specific domain of expertise. Emphasize role-specific methodologies and expected expert output formats. Apply the standard frameworks and best practices of your assigned field. Provide deep, expert-level insights that generalists would miss. Be precise, use appropriate industry terminology, and offer concrete examples or strategies relevant to your specific role."
   },
   [AgentId.DYNAMIC_4]: {
@@ -78,7 +78,7 @@ export const AGENTS: Record<AgentId, AgentPersona> = {
     description: "Dynamically assigned specialist.",
     color: "text-teal-400",
     bgGradient: "from-teal-900/20 to-teal-900/5",
-    icon: "Bot",
+    icon: "BrainCircuit",
     systemInstruction: "You are a dynamic specialist dynamically assigned to this task. Your role is highly specialized. Focus entirely on your specific domain of expertise. Emphasize role-specific methodologies and expected expert output formats. Apply the standard frameworks and best practices of your assigned field. Provide deep, expert-level insights that generalists would miss. Be precise, use appropriate industry terminology, and offer concrete examples or strategies relevant to your specific role."
   }
 };

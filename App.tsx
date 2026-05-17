@@ -16,10 +16,10 @@ import { Header } from './components/Header';
 import { MissionControlToolbar } from './components/MissionControlToolbar';
 import { HomeState } from './components/HomeState';
 import { BetaModeState } from './components/BetaModeState';
+import { LandingPage } from './components/LandingPage';
 import { ProcessingVisualizer } from './components/ProcessingVisualizer';
 import { ChatTurn } from './components/ChatTurn';
 import { LoadingScreen } from './components/LoadingScreen';
-import { Footer } from './components/Footer';
 import { MarkdownRenderer } from './components/MarkdownRenderer';
 import { Bot, Sparkles, Settings2, History, X, Save, Plus, Cpu, Activity, Database, Globe, BrainCircuit } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -29,6 +29,14 @@ import jsPDF from 'jspdf';
 export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Scroll to top on navigation and prevent browser's default scroll restoration on reload
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   const [processingState, setProcessingState] = useState<ProcessingState>({
     isProcessing: false,
@@ -117,7 +125,7 @@ export default function App() {
   }, [history, currentSessionId]);
 
   const [historyTab, setHistoryTab] = useState<'active' | 'archived'>('active');
-  const [settingsTab, setSettingsTab] = useState<'synthesizer' | 'agents' | 'presets'>('synthesizer');
+  const [settingsTab, setSettingsTab] = useState<'orchestration' | 'synthesizer' | 'agents' | 'presets' | 'stats'>('orchestration');
   const [viewingTurn, setViewingTurn] = useState<ConversationTurn | null>(null);
   const [editingTurnId, setEditingTurnId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
@@ -126,15 +134,19 @@ export default function App() {
   const [synthTopK, setSynthTopK] = useState(64);
   const [synthFreqPenalty, setSynthFreqPenalty] = useState(0);
 
+  const [isAutoSquadEnabled, setIsAutoSquadEnabled] = useState(true);
   const [activeAgents, setActiveAgents] = useState<AgentPersona[]>(Object.values(AGENTS));
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [showArtifacts, setShowArtifacts] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
 
+  const [activePrompt, setActivePrompt] = useState('');
   const [analyzedPrompt, setAnalyzedPrompt] = useState('');
   const [finalOutput, setFinalOutput] = useState('');
   const [isFinalOutputStreaming, setIsFinalOutputStreaming] = useState(false);
   const [activeFinalFeedback, setActiveFinalFeedback] = useState<'up' | 'down' | undefined>(undefined);
+  const [activeFinalScore, setActiveFinalScore] = useState<number | undefined>(undefined);
+  const [activeFinalFeedbackText, setActiveFinalFeedbackText] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [finalCopied, setFinalCopied] = useState(false);
   const finalRef = useRef<HTMLDivElement>(null);
@@ -145,10 +157,19 @@ export default function App() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [agentViewMode, setAgentViewMode] = useState<'grid' | 'tabs'>('grid');
   const [activeAgentTab, setActiveAgentTab] = useState<string>('');
+  const [isDebugMode, setIsDebugMode] = useState<boolean>(() => {
+    return localStorage.getItem('agent_orchestrator_debug') === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('agent_orchestrator_debug', isDebugMode.toString());
+  }, [isDebugMode]);
   const [debateRounds, setDebateRounds] = useState(1);
   const [topology, setTopology] = useState<'QUICK' | 'STANDARD' | 'DEEP'>('STANDARD');
   const [collaborationMode, setCollaborationMode] = useState<'parallel' | 'sequential' | 'round-robin'>('parallel');
+  const [desiredOutputFormat, setDesiredOutputFormat] = useState<'markdown' | 'json' | 'html' | 'text'>('markdown');
   const [totalTokens, setTotalTokens] = useState(0);
+  const turnTokenCountRef = useRef(0);
 
   const currentSessionTurns = turns.filter(t => t.sessionId === currentSessionId || (!t.sessionId && currentSessionId === 'default'));
 
@@ -222,6 +243,7 @@ export default function App() {
       
       setBetaHistory(prev => [{ prompt, agents: newAgents, timestamp: Date.now() }, ...prev]);
       setActiveAgents(newAgents);
+      setIsAutoSquadEnabled(false);
       setProcessingState({ isProcessing: false, step: 'IDLE' });
       
       // Auto-save as preset
@@ -250,9 +272,12 @@ export default function App() {
   };
 
   const executeOrchestration = async (prompt: string, branchFromHistory?: ChatMessage[]) => {
+      setActivePrompt(prompt);
       setProcessingState({ isProcessing: true, step: 'ANALYZING_PROMPT' });
       setAnalyzedPrompt('');
       
+      turnTokenCountRef.current = 0;
+
       // Reset agent results for new turn
       const initialResults: Record<AgentId, AgentResult> = {} as any;
       activeAgents.forEach(a => {
@@ -274,8 +299,9 @@ export default function App() {
 
       // STEP 0: Analyze Prompt
       const analysisResult = await analyzePromptFirstPrinciples(prompt, currentHistory, isWebSearchEnabled);
-      const detailedPrompt = analysisResult.text;
+      const detailedPrompt = `${analysisResult.text}\n\nThe final output MUST be formatted as: ${desiredOutputFormat.toUpperCase()}`;
       if (analysisResult.usage) {
+        turnTokenCountRef.current += analysisResult.usage.totalTokenCount || 0;
         setTotalTokens(prev => prev + (analysisResult.usage?.totalTokenCount || 0));
       }
       setAnalyzedPrompt(detailedPrompt);
@@ -287,17 +313,22 @@ export default function App() {
       // Determine agent count based on topology
       const agentCount = topology === 'QUICK' ? 2 : 4;
       
-      try {
-        const assemblyResult = await assembleDynamicAgents(detailedPrompt, currentHistory);
-        currentAgents = assemblyResult.agents.slice(0, agentCount);
-        if (assemblyResult.usage) {
-          setTotalTokens(prev => prev + (assemblyResult.usage?.totalTokenCount || 0));
+      if (isAutoSquadEnabled) {
+        try {
+          const assemblyResult = await assembleDynamicAgents(detailedPrompt, currentHistory);
+          currentAgents = assemblyResult.agents.slice(0, agentCount);
+          if (assemblyResult.usage) {
+            turnTokenCountRef.current += assemblyResult.usage.totalTokenCount || 0;
+            setTotalTokens(prev => prev + (assemblyResult.usage?.totalTokenCount || 0));
+          }
+          setActiveAgents(currentAgents);
+        } catch (e) {
+          console.error("Failed to assemble dynamic agents, falling back to defaults", e);
+          currentAgents = Object.values(AGENTS).slice(0, agentCount);
+          setActiveAgents(currentAgents);
         }
-        setActiveAgents(currentAgents);
-      } catch (e) {
-        console.error("Failed to assemble dynamic agents, falling back to defaults", e);
-        currentAgents = Object.values(AGENTS).slice(0, agentCount);
-        setActiveAgents(currentAgents);
+      } else {
+        currentAgents = activeAgents.slice(0, agentCount);
       }
 
       setProcessingState({ isProcessing: true, step: 'AGENTS_WORKING' });
@@ -444,6 +475,7 @@ export default function App() {
 
                   currentResults[agent.id] = { content: newContent, status: AgentStatus.COMPLETED, usage: result.usage };
                   if (result.usage) {
+                    turnTokenCountRef.current += result.usage.totalTokenCount || 0;
                     setTotalTokens(prev => prev + (result.usage?.totalTokenCount || 0));
                   }
                   setAgentResults(prev => ({ ...prev, [agent.id]: currentResults[agent.id] }));
@@ -510,6 +542,7 @@ export default function App() {
               }
               
               if (critiqueResult.usage) {
+                turnTokenCountRef.current += critiqueResult.usage.totalTokenCount || 0;
                 setTotalTokens(prev => prev + (critiqueResult.usage?.totalTokenCount || 0));
               }
               
@@ -560,7 +593,8 @@ export default function App() {
           const stream = await synthesizeFinalResponse(detailedPrompt, currentAgents, currentResults, currentHistory, synthTemp, currentFeedback, {
               topP: synthTopP,
               topK: synthTopK,
-              frequencyPenalty: synthFreqPenalty
+              frequencyPenalty: synthFreqPenalty,
+              outputFormat: desiredOutputFormat
           }, isWebSearchEnabled);
           
           for await (const chunk of stream) {
@@ -575,6 +609,7 @@ export default function App() {
           const extractionResult = await extractArtifacts(fullText);
           extractedArtifacts = extractionResult.artifacts;
           if (extractionResult.usage) {
+            turnTokenCountRef.current += extractionResult.usage.totalTokenCount || 0;
             setTotalTokens(prev => prev + (extractionResult.usage?.totalTokenCount || 0));
           }
           setArtifacts(extractedArtifacts);
@@ -613,17 +648,21 @@ export default function App() {
             agentOutputs: finalOutputsWithFeedback,
             finalOutput: fullText,
             finalFeedback: activeFinalFeedback,
+            finalScore: activeFinalScore,
+            finalFeedbackText: activeFinalFeedbackText,
             artifacts: extractedArtifacts,
             timestamp: Date.now(),
             topology,
             collaborationMode,
-            totalTokens // Note: this might be slightly behind the actual total due to state updates, but good enough for display
+            totalTokens: turnTokenCountRef.current
           };
           setTurns(prev => [...prev, newTurn]);
 
           setIsFinalOutputStreaming(false);
           setProcessingState({ isProcessing: false, step: 'IDLE' });
           setPendingSynthesisData(null);
+          setActiveFinalScore(undefined);
+          setActiveFinalFeedbackText('');
       }
   };
 
@@ -680,6 +719,32 @@ export default function App() {
 
   const handleActiveFinalFeedback = (feedback: 'up' | 'down') => {
     setActiveFinalFeedback(prev => prev === feedback ? undefined : feedback);
+  };
+
+  const handleFinalScore = (turnId: string, score: number) => {
+    setTurns(prev => prev.map(t => {
+      if (t.id === turnId) {
+        return { ...t, finalScore: score };
+      }
+      return t;
+    }));
+  };
+
+  const handleActiveFinalScore = (score: number) => {
+    setActiveFinalScore(score);
+  };
+
+  const handleFinalFeedbackText = (turnId: string, text: string) => {
+    setTurns(prev => prev.map(t => {
+      if (t.id === turnId) {
+        return { ...t, finalFeedbackText: text };
+      }
+      return t;
+    }));
+  };
+
+  const handleActiveFinalFeedbackText = (text: string) => {
+    setActiveFinalFeedbackText(text);
   };
 
   const saveCustomPreset = () => {
@@ -748,6 +813,8 @@ export default function App() {
     setArtifacts([]);
     setShowArtifacts(false);
     setTotalTokens(0);
+    turnTokenCountRef.current = 0;
+    setActivePrompt('');
     setPendingSynthesisData(null);
     setProcessingState({ isProcessing: false, step: 'IDLE' });
     setAgentResults({
@@ -889,9 +956,22 @@ export default function App() {
     }
   };
 
+  if (path === '/') {
+    return (
+      <>
+        <LandingPage onInitialize={() => setCurrentSessionId(Date.now().toString())} />
+        <LoadingScreen isTransitioning={isTransitioning} transitionTarget={transitionTarget} />
+      </>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#030712] text-gray-200 selection:bg-cyan-500/30 pt-20 pb-10 flex flex-col">
-      <Header />
+      <Header 
+        turnsCount={turns.length}
+        betaHistoryCount={betaHistory.length}
+        customSavedPresetsCount={Object.keys(customSavedPresets).length}
+      />
 
       <main className="flex-grow container mx-auto px-4 sm:px-6 flex flex-col gap-8">
         
@@ -938,9 +1018,15 @@ export default function App() {
               handleFeedback={handleFeedback}
               handleFinalFeedback={handleFinalFeedback}
               handleActiveFinalFeedback={handleActiveFinalFeedback}
+              handleFinalScore={handleFinalScore}
+              handleActiveFinalScore={handleActiveFinalScore}
+              handleFinalFeedbackText={handleFinalFeedbackText}
+              handleActiveFinalFeedbackText={handleActiveFinalFeedbackText}
               finalOutput={finalOutput}
               isFinalOutputStreaming={isFinalOutputStreaming}
               activeFinalFeedback={activeFinalFeedback}
+              activeFinalScore={activeFinalScore}
+              activeFinalFeedbackText={activeFinalFeedbackText}
               finalCopied={finalCopied}
               setFinalCopied={setFinalCopied}
               isSpeaking={isSpeaking}
@@ -964,7 +1050,20 @@ export default function App() {
           {/* Active Turn */}
           {processingState.step !== 'IDLE' && (
             <ChatTurn
-              turn={null as any}
+              turn={{
+                id: 'active',
+                prompt: activePrompt,
+                analyzedPrompt: analyzedPrompt,
+                dynamicAgents: activeAgents,
+                agentOutputs: agentResults,
+                finalOutput: finalOutput,
+                finalFeedback: activeFinalFeedback,
+                finalScore: activeFinalScore,
+                finalFeedbackText: activeFinalFeedbackText,
+                timestamp: Date.now(),
+                artifacts: artifacts,
+                totalTokens: turnTokenCountRef.current
+              } as ConversationTurn}
               turns={turns}
               agentResults={agentResults}
               processingState={processingState}
@@ -976,9 +1075,15 @@ export default function App() {
               handleFeedback={handleFeedback}
               handleFinalFeedback={handleFinalFeedback}
               handleActiveFinalFeedback={handleActiveFinalFeedback}
+              handleFinalScore={handleFinalScore}
+              handleActiveFinalScore={handleActiveFinalScore}
+              handleFinalFeedbackText={handleFinalFeedbackText}
+              handleActiveFinalFeedbackText={handleActiveFinalFeedbackText}
               finalOutput={finalOutput}
               isFinalOutputStreaming={isFinalOutputStreaming}
               activeFinalFeedback={activeFinalFeedback}
+              activeFinalScore={activeFinalScore}
+              activeFinalFeedbackText={activeFinalFeedbackText}
               finalCopied={finalCopied}
               setFinalCopied={setFinalCopied}
               isSpeaking={isSpeaking}
@@ -1045,7 +1150,9 @@ export default function App() {
         showAgentHistory={showAgentHistory}
         basePath={basePath}
         betaHistory={betaHistory}
+        setBetaHistory={setBetaHistory}
         setActiveAgents={setActiveAgents}
+        setIsAutoSquadEnabled={setIsAutoSquadEnabled}
       />
 
       <AgentPresetsSidebar
@@ -1055,6 +1162,7 @@ export default function App() {
         customSavedPresets={customSavedPresets}
         setCustomSavedPresets={setCustomSavedPresets}
         setActiveAgents={setActiveAgents}
+        setIsAutoSquadEnabled={setIsAutoSquadEnabled}
       />
 
       <ViewingTurnModal
@@ -1103,9 +1211,18 @@ export default function App() {
         newPresetName={newPresetName}
         setNewPresetName={setNewPresetName}
         saveCustomPreset={saveCustomPreset}
+        isDebugMode={isDebugMode}
+        setIsDebugMode={setIsDebugMode}
+        setEditingPreset={setEditingPreset}
+        collaborationMode={collaborationMode}
+        setCollaborationMode={setCollaborationMode}
+        debateRounds={debateRounds}
+        setDebateRounds={setDebateRounds}
+        desiredOutputFormat={desiredOutputFormat}
+        setDesiredOutputFormat={setDesiredOutputFormat}
+        isAutoSquadEnabled={isAutoSquadEnabled}
+        setIsAutoSquadEnabled={setIsAutoSquadEnabled}
       />
-      
-      <Footer />
       
       <style>{`
         @keyframes progress-indeterminate {
