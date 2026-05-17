@@ -7,12 +7,12 @@
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.0-blue.svg?style=flat-square&logo=typescript" alt="TypeScript" /></a>
   <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC.svg?style=flat-square&logo=tailwind-css" alt="Tailwind CSS" /></a>
   <a href="https://vitest.dev/"><img src="https://img.shields.io/badge/Vitest-4.0-yellow.svg?style=flat-square&logo=vitest" alt="Vitest" /></a>
-  <a href="https://deepmind.google/technologies/gemini/"><img src="https://img.shields.io/badge/AI-Gemini_3.1-orange.svg?style=flat-square" alt="Gemini" /></a>
+  <a href="https://ai.google.dev/gemma"><img src="https://img.shields.io/badge/AI-Gemma_4_31B-orange.svg?style=flat-square" alt="Gemma 4 31B" /></a>
 </p>
 
-**The Infinite Intelligence** is a premium, client-side multi-agent AI orchestration platform designed to tackle high-complexity reasoning, synthesis, and creative tasks. By organizing a specialized squad of four distinct expert personas (and custom user-defined agents), the platform analyzes problems from **first principles**, facilitates inter-agent debate and refinement, incorporates human-in-the-loop steering, and synthesizes unified executive reports.
+**The Infinite Intelligence** is a premium, client-side multi-agent AI orchestration platform designed to solve the problem of **reasoning saturation and bias** in single-agent prompts. By organizing a specialized squad of four distinct expert personas (and custom user-defined agents), the platform analyzes problems from **first principles**, facilitates inter-agent debate, and synthesizes unified executive reports.
 
-Built as an interactive single-page application (SPA), the workspace prioritizes visual clarity, modularity, and high-performance client-side execution using Google's modern Gemini models via `@google/genai`.
+Built as an interactive single-page application (SPA), the workspace prioritizes visual clarity, modularity, and high-performance client-side execution using Google's **Gemma 4 31B (`gemma-4-31b-it`)** via `@google/genai`.
 
 ---
 
@@ -21,8 +21,9 @@ Built as an interactive single-page application (SPA), the workspace prioritizes
 - [🤔 The "Why" behind The Infinite Intelligence](#-the-why-behind-the-infinite-intelligence)
 - [🏗️ Orchestration Flow & Architecture](#%EF%B8%8F-orchestration-flow--architecture)
 - [✨ Key Features](#-key-features)
-- [💻 Technology Stack](#-technology-stack)
+- [💻 Technology Stack & Architecture Decisions](#-technology-stack--architecture-decisions)
 - [🚀 Quick Start & Installation](#-quick-start--installation)
+- [🎮 Usage Instructions & Examples](#-usage-instructions--examples)
 - [🛠️ Developer Guide (Extending the Squad)](#%EF%B8%8F-developer-guide-extending-the-squad)
 - [🧪 Testing & Quality Assurance](#-testing--quality-assurance)
 - [🤝 Contribution Guidelines](#-contribution-guidelines)
@@ -87,15 +88,26 @@ graph TD
 
 ---
 
-## 💻 Technology Stack
+## 💻 Technology Stack & Architecture Decisions
 
-*   **Core UI & State:** [React 19](https://react.dev/) & [TypeScript](https://www.typescriptlang.org/) — Ensures predictable, type-safe state management across complex sidebars, modals, and streaming states.
-*   **Styling & Themes:** [Tailwind CSS](https://tailwindcss.com/) — Premium, dark-mode-first styling with modern frosted glass (glassmorphism) layout.
-*   **Animations:** [Motion 12](https://motion.dev/) — Micro-interactions, slide-out sidebar panels, and interactive state transitions.
-*   **Icons:** [Lucide React](https://lucide.dev/) — Consistent, high-quality outline vector iconography.
-*   **AI Service Layer:** `@google/genai` (using Gemma 4/Gemini SDK) — Modern API integration supporting streaming, system instructions, and temperature tuning.
-*   **Document Export:** `html2canvas` & `jsPDF` — Client-side HTML-to-vector PDF translation.
-*   **Test Runner:** [Vitest](https://vitest.dev/) & [React Testing Library](https://testing-library.com/) — Light-speed test execution with complete DOM mocking and coverage indicators.
+We carefully selected our stack to prioritize client-side performance, maintainability, and user privacy.
+
+*   **Core UI & State:** [React 19](https://react.dev/) & [TypeScript](https://www.typescriptlang.org/)
+    *   *Why:* Ensures predictable, type-safe state management across complex sidebars, modals, and streaming states. React 19's concurrent features handle heavy UI updates smoothly.
+*   **Styling & Themes:** [Tailwind CSS](https://tailwindcss.com/)
+    *   *Why:* Enables rapid, consistent styling. We use a dark-mode-first, frosted glass (glassmorphism) layout to reduce eye strain during long reasoning sessions.
+*   **Animations:** [Motion 12](https://motion.dev/)
+    *   *Why:* Provides fluid micro-interactions and slide-out sidebar panels, making the complex multi-agent UI feel responsive and intuitive.
+*   **Icons:** [Lucide React](https://lucide.dev/)
+    *   *Why:* Consistent, high-quality outline vector iconography.
+*   **AI Service Layer:** `@google/genai` (using Gemma 4 31B `gemma-4-31b-it`)
+    *   *Why:* Offers state-of-the-art reasoning capabilities with robust support for streaming and system instructions, directly from the client.
+*   **Document Export:** `html2canvas` & `jsPDF`
+    *   *Why:* Client-side HTML-to-vector PDF translation.
+*   **Zero-Backend Architecture:** Client-side execution
+    *   *Why:* Ensures zero server footprint. Users maintain complete control of their API keys and session data, maximizing privacy and reducing operational costs.
+*   **Test Runner:** [Vitest](https://vitest.dev/) & [React Testing Library](https://testing-library.com/)
+    *   *Why:* Light-speed test execution with complete DOM mocking and coverage indicators.
 
 ---
 
@@ -136,6 +148,31 @@ graph TD
     npm run build
     ```
     Static build files will be outputted to the `dist/` directory, optimized and ready for production deployment (e.g., Vercel, Netlify, or GitHub Pages).
+
+---
+
+## 🎮 Usage Instructions & Examples
+
+Once the application is running, follow these steps to leverage the multi-agent squad:
+
+### 1. Formulate Your Prompt
+Start by entering a complex query in the main input area. The platform excels at high-complexity reasoning tasks.
+*Example: "Design a scalable system architecture for a real-time collaborative document editor, highlighting potential bottlenecks and security concerns."*
+
+### 2. Choose Your Orchestration Mode
+Select how the agents should collaborate:
+- **Parallel:** Agents work simultaneously for faster, independent perspectives.
+- **Sequential:** Agents build upon each other's work (e.g., Analyst -> Coder -> Critic).
+- **Round-Robin:** Agents engage in iterative debate to refine the solution.
+
+### 3. Review and Steer (Human-In-The-Loop)
+As agents generate insights, use the steering controls to guide them:
+- Click the **thumbs up/down** to approve or reject specific agent thoughts.
+- Add steering comments to redirect an agent's focus before the next iteration.
+
+### 4. Export the Executive Summary
+Once the squad reaches a consensus, the Synthesizer agent will compile a master report.
+- Click the **Export PDF** or **Export Markdown** buttons to save the final report.
 
 ---
 
