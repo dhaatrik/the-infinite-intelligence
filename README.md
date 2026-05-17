@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/logo.png" width="120" style="border-radius: 20px; background-color: #000; padding: 10px;" />
+</p>
+
 <h1 align="center">🌌 The Infinite Intelligence</h1>
 
 <p align="center">
