@@ -44,9 +44,13 @@ export const HomeState: React.FC<HomeStateProps> = ({ handleNavigateWithTransiti
           {/* Badge & Logo */}
           <motion.div variants={itemVariants} className="flex flex-col items-center mb-10">
               <div className="relative mb-6 group cursor-pointer" onClick={() => handleNavigateWithTransition('/beta')}>
-                  <div className="absolute inset-0 bg-cyan-400 blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-700 animate-pulse"></div>
-                  <div className="relative w-20 h-20 rounded-2xl bg-[#0a0a0a] border border-white/10 flex items-center justify-center shadow-2xl transition-transform duration-500 group-hover:rotate-[360deg]">
-                      <Infinity size={40} className="text-cyan-400" />
+                  <div className="absolute inset-0 bg-cyan-400 blur-2xl opacity-10 group-hover:opacity-30 transition-opacity duration-700"></div>
+                  <div className="relative w-24 h-24 rounded-3xl bg-black border border-white/10 flex items-center justify-center shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:border-cyan-500/50">
+                      <img 
+                        src="/logo.png" 
+                        alt="The Infinite Intelligence Logo" 
+                        className="relative w-16 h-16 object-contain group-hover:rotate-12 transition-transform duration-700" 
+                      />
                   </div>
               </div>
               <span className="px-3 py-1 text-[10px] uppercase tracking-[0.3em] font-bold bg-white/5 border border-white/10 rounded-full text-cyan-400 backdrop-blur-md">

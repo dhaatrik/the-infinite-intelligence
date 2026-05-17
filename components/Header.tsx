@@ -44,9 +44,13 @@ export const Header: React.FC<HeaderProps> = ({
       } h-16 flex items-center justify-between px-6`}
     >
       <Link to="/home" className="flex items-center gap-3 group">
-        <div className="relative flex items-center justify-center p-1.5 rounded-xl bg-white/5 border border-white/10 group-hover:bg-white/10 transition-colors">
-            <div className="absolute inset-0 bg-cyan-500 blur-xl opacity-20 group-hover:opacity-60 transition-opacity animate-pulse text-cyan-400"></div>
-            <Infinity className="relative text-cyan-400 group-hover:rotate-180 transition-transform duration-700 ease-in-out" size={24} />
+        <div className="relative flex items-center justify-center p-1 rounded-xl bg-black border border-white/10 group-hover:border-cyan-500/50 transition-all duration-500 shadow-2xl">
+            <div className="absolute inset-0 bg-cyan-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <img 
+              src="/logo.png" 
+              alt="The Infinite Intelligence Logo" 
+              className="relative w-7 h-7 object-contain group-hover:scale-110 transition-transform duration-500" 
+            />
         </div>
         <div className="flex flex-col">
           <h1 style={{ fontFamily: "Space Grotesk, sans-serif" }} className="text-xl font-black tracking-tight text-white leading-none">
